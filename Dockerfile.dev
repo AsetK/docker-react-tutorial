@@ -1,0 +1,44 @@
+#Из-за того что docker на wsl2 а не Hyper-V, весь проект "frontend" нужно переместить в файловую систему Linux
+#В уроке 74 описание как это сделать в разделе "WSL2 with Ubuntu". Примечание: не забудь поставить точку в пункте 3 описания
+FROM node:alpine
+     
+USER node
+     
+RUN mkdir -p /home/node/app
+WORKDIR /home/node/app
+     
+COPY --chown=node:node ./package.json ./
+RUN npm install
+COPY --chown=node:node ./ ./
+     
+CMD ["npm", "start"]
+
+#Команда для запуска docker run -it -p 3000:3000 -v /home/node/app/node_modules -v ~/frontend:/home/node/app assetken:frontend
+#-v /localFiles:/containerFiles   -  это значит каждый раз когда контейнер пытается получить доступ к папке /containerFiles - обращаться
+#в папку /localFiles на локальной машине. 
+
+#А если мы просто -v /containerFiles (как в  -v /home/node/app/node_modules), это значит обращаяся к самой папке в контейнере.
+#Зачем это надо? - сделать искючение в команде -v /localFiles:/containerFiles. Исключение нужно из-за того что папки app/node_modules
+#нет на локальной машине, поэтому мы смотрим в сам контейнер.
+#Под локальной машиной тут понимается файловая система Linux в которую мы перенесли проект "frontend"
+
+
+
+
+#Начальный dockerfile
+# Из-за ошибки при build пришлось править dockerfile
+#Ошибка - EACCES: permission denied, mkdir '/app/node_modules.cache'
+#Решение в уроке 74. Там есть ссылка на решение.
+#Думаю ошибка связана с node а не docker. Типа node должен запускаться не от "root" пользователя а "node" пользователя 
+# FROM node:alpine
+
+# WORKDIR '/app'
+
+# COPY package.json .
+# RUN npm install
+
+# COPY . .
+
+# CMD ["npm", "run", "start"]
+
+
