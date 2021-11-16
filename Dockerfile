@@ -15,6 +15,7 @@ CMD ["npm", "build"]
 #/app/build <--- build will be created here
 
 FROM nginx
+EXPOSE 80
 COPY --from=builder /home/node/app/build /usr/share/nginx/html
 
 #Then build and run(docker run -p 8080:80 imageId)
